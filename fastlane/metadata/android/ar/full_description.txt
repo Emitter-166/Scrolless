@@ -29,5 +29,5 @@ TikTok وTikTok Lite وInstagram Reels وYouTube Shorts وFacebook Reels وFaceb
 
 قلّل التمرير بلا وعي، تمريرة أقل في كل مرة.
 
-الشفرة المصدرية: https://github.com/DuarteBarbosaDev/Scrolless
+الشفرة المصدرية: https://github.com/Emitter-166/Scrolless
 الأيقونات من Icons8

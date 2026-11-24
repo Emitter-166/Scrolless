@@ -29,5 +29,5 @@ Scrolless 僅使用無障礙功能來偵測支援的短影音畫面並套用你�
 
 減少無意識的滑手機，一次少滑一點。
 
-原始碼：https://github.com/DuarteBarbosaDev/Scrolless
+原始碼：https://github.com/Emitter-166/Scrolless
 圖示來源：Icons8

@@ -17,6 +17,16 @@ Using Android's accessibility permissions, the app detects and blocks this type 
 Since the app requires accessibility permissions, which can have sketchy uses, Scrolless is fully open-source.
 
 
+## Emitter fork: Instagram without the feed
+
+Source: https://github.com/Emitter-166/Scrolless (fork of DuarteBarbosaDev/Scrolless).
+
+Select **Block All**, enable the accessibility service, and keep blocking unpaused. This fork covers recognized Instagram **Home and Explore recommendation areas** with an opaque, touch-consuming message, leaving the header (messages/search) and bottom tabs available. DMs, profiles and profile posts remain accessible; full-screen Reels still trigger Back. The cover uses the existing blocking mode, so Daily Limit, Interval Timer and Pause can allow feeds temporarily. DM-video exceptions do not exempt Home/Explore. Enable **Include Stories** to block full-screen Stories as well.
+
+This is an accessibility overlay, not a modification of Instagram: content may still download/play behind the cover, and a frame may appear before detection. It targets the standard `com.instagram.android` app, not Instagram Lite, clones or the website. Detection relies on known resource IDs plus selected navigation tabs and avoids generic scrolling-list matching to protect messages/profiles. Unknown Instagram layouts may not match. Regression tests use synthetic layouts; no claim of device/version compatibility is made without testing. If a feed slips through, provide the Instagram version and a redacted accessibility layout captured only on a feed screen (never share private chats).
+
+The APK retains local usage history (app category, duration and timestamps). Android system backup remains enabled, so history may be copied into system-managed backups or device transfers. No Internet permission or telemetry was added.
+
 ## Features
 
 - **Block All**  
@@ -75,4 +85,4 @@ Some icons used in this app are obtained from [Icons8](https://icons8.com).
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=DuarteBarbosaDev/Scrolless&type=Date)](https://star-history.com/#DuarteBarbosaPT/Scrolless&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Emitter-166/Scrolless&type=Date)](https://star-history.com/#Emitter-166/Scrolless&Date)

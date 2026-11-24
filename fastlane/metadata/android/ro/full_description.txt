@@ -29,5 +29,5 @@ Scrolless folosește accesibilitatea doar pentru a detecta ecranele compatibile 
 
 Mai puțin scroll fără rost, de fiecare dată cu un scroll mai puțin.
 
-Cod sursă: https://github.com/DuarteBarbosaDev/Scrolless
+Cod sursă: https://github.com/Emitter-166/Scrolless
 Pictograme de la Icons8

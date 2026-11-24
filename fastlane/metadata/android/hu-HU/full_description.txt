@@ -29,5 +29,5 @@ A Scrolless a kisegítő lehetőségeket kizárólag a támogatott rövidvideó-
 
 Kevesebb céltalan görgetés, mindig eggyel kevesebb.
 
-Forráskód: https://github.com/DuarteBarbosaDev/Scrolless
+Forráskód: https://github.com/Emitter-166/Scrolless
 Ikonok: Icons8

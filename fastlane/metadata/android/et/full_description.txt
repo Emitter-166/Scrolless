@@ -29,5 +29,5 @@ Scrolless kasutab juurdepääsetavuse teenust ainult toetatud lühivideokuvade t
 
 Vähem mõttetut kerimist, üks kerimine korraga.
 
-Lähtekood: https://github.com/DuarteBarbosaDev/Scrolless
+Lähtekood: https://github.com/Emitter-166/Scrolless
 Ikoonid: Icons8

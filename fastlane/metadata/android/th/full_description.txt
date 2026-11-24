@@ -29,5 +29,5 @@ Scrolless ใช้การช่วยเหลือพิเศษเพี�
 
 ลดการเลื่อนดูแบบไร้จุดหมาย ทีละน้อย
 
-ซอร์สโค้ด: https://github.com/DuarteBarbosaDev/Scrolless
+ซอร์สโค้ด: https://github.com/Emitter-166/Scrolless
 ไอคอนโดย Icons8

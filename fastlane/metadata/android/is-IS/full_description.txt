@@ -29,5 +29,5 @@ Scrolless notar aðgengisþjónustuna eingöngu til að greina studda skjái me�
 
 Minna hugsunarlaust skrun, einu skruni minna í einu.
 
-Frumkóði: https://github.com/DuarteBarbosaDev/Scrolless
+Frumkóði: https://github.com/Emitter-166/Scrolless
 Tákn frá Icons8

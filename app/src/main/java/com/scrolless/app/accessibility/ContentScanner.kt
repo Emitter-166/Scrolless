@@ -186,7 +186,12 @@ internal class ContentScanner(
         // Keep tracking detected content even when the user's DM setting allows it through.
         return DetectedBlockedContent(
             app = blockableApp,
-            blockingSuppressed = shouldSuppressBlocking(blockableApp, cover),
+            // A DM-video exception must never exempt Instagram's Home/Explore cover.
+            blockingSuppressed = if (cover != null && blockableApp.app == BlockableApp.REELS) {
+                false
+            } else {
+                shouldSuppressBlocking(blockableApp, cover)
+            },
             cover = cover,
         )
     }
@@ -268,7 +273,7 @@ internal class ContentScanner(
     private fun AccessibilityNodeInfo.coverNodes(app: ResolvedBlockableApp, viewIds: Set<String>): List<ContentCoverNode> =
         viewIds.flatMap { id ->
             findAccessibilityNodeInfosByViewId("${app.packageId}:id/$id").map { node ->
-                ContentCoverNode(id, node.coverBounds(), node.isVisibleToUser)
+                ContentCoverNode(id, node.coverBounds(), node.isVisibleToUser, node.isSelected)
             }
         }
 

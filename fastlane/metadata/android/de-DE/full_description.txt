@@ -29,5 +29,5 @@ Scrolless nutzt die Bedienungshilfen nur, um unterstützte Kurzvideo-Bildschirme
 
 Weniger gedankenloses Scrollen, Scroll für Scroll.
 
-Quellcode: https://github.com/DuarteBarbosaDev/Scrolless
+Quellcode: https://github.com/Emitter-166/Scrolless
 Icons von Icons8

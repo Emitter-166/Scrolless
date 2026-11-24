@@ -29,5 +29,5 @@ Scrolless používa prístupnosť iba na rozpoznanie podporovaných obrazoviek s
 
 Menej bezmyšlienkovitého scrollovania, zakaždým o jeden scroll menej.
 
-Zdrojový kód: https://github.com/DuarteBarbosaDev/Scrolless
+Zdrojový kód: https://github.com/Emitter-166/Scrolless
 Ikony od Icons8

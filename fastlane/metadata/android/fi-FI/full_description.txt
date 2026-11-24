@@ -29,5 +29,5 @@ Scrolless käyttää esteettömyyspalvelua vain tunnistaakseen tuetut lyhytvideo
 
 Vähemmän ajatuksetonta selaamista, vieritys kerrallaan.
 
-Lähdekoodi: https://github.com/DuarteBarbosaDev/Scrolless
+Lähdekoodi: https://github.com/Emitter-166/Scrolless
 Kuvakkeet: Icons8

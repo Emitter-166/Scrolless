@@ -29,5 +29,5 @@ TikTok, TikTok Lite, Instagram Reels, YouTube Shorts, Facebook Reels, Facebook L
 
 Λιγότερο άσκοπο scrolling, κάθε φορά ένα scroll λιγότερο.
 
-Πηγαίος κώδικας: https://github.com/DuarteBarbosaDev/Scrolless
+Πηγαίος κώδικας: https://github.com/Emitter-166/Scrolless
 Εικονίδια από Icons8

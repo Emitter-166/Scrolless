@@ -29,5 +29,5 @@ Scrolless koristi pristupačnost samo za prepoznavanje podržanih zaslona s krat
 
 Manje besciljnog listanja, svaki put jedan scroll manje.
 
-Izvorni kod: https://github.com/DuarteBarbosaDev/Scrolless
+Izvorni kod: https://github.com/Emitter-166/Scrolless
 Ikone: Icons8

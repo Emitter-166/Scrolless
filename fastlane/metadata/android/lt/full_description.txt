@@ -29,5 +29,5 @@ Scrolless naudoja pritaikymo neįgaliesiems paslaugą tik palaikomiems trumpųj�
 
 Mažiau beprasmio slinkimo – vis vienu slinkimu mažiau.
 
-Šaltinio kodas: https://github.com/DuarteBarbosaDev/Scrolless
+Šaltinio kodas: https://github.com/Emitter-166/Scrolless
 Piktogramos: Icons8

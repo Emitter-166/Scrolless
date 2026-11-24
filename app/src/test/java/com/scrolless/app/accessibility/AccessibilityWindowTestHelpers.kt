@@ -88,6 +88,10 @@ class IndexedTestNode : ShadowAccessibilityNodeInfo() {
 
     @Suppress("unused")
     @Implementation
-    fun findAccessibilityNodeInfosByViewId(viewId: String): List<AccessibilityNodeInfo> =
-        if (node.viewIdResourceName == viewId) listOf(node) else emptyList()
+    fun findAccessibilityNodeInfosByViewId(viewId: String): List<AccessibilityNodeInfo> = buildList {
+        if (node.viewIdResourceName == viewId) add(node)
+        repeat(node.childCount) { index ->
+            node.getChild(index)?.let { addAll(it.findAccessibilityNodeInfosByViewId(viewId)) }
+        }
+    }
 }

@@ -29,5 +29,5 @@ Scrolless एक्सेसिबिलिटी का उपयोग के�
 
 बेवजह की स्क्रॉलिंग कम करें, एक-एक स्क्रॉल करके।
 
-सोर्स कोड: https://github.com/DuarteBarbosaDev/Scrolless
+सोर्स कोड: https://github.com/Emitter-166/Scrolless
 आइकन सौजन्य: Icons8

@@ -29,5 +29,5 @@ Scrolless משתמשת בנגישות רק כדי לזהות מסכי סרטונ
 
 פחות גלילה אוטומטית, גלילה אחת בכל פעם.
 
-קוד מקור: https://github.com/DuarteBarbosaDev/Scrolless
+קוד מקור: https://github.com/Emitter-166/Scrolless
 אייקונים מאת Icons8

@@ -29,5 +29,5 @@ Scrolless usa la accesibilidad solo para detectar pantallas de vídeos cortos co
 
 Menos scroll sin sentido, un scroll menos cada vez.
 
-Código fuente: https://github.com/DuarteBarbosaDev/Scrolless
+Código fuente: https://github.com/Emitter-166/Scrolless
 Iconos de Icons8

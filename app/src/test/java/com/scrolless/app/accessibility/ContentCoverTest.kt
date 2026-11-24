@@ -34,10 +34,10 @@ class ContentCoverTest {
     private val cover = ContentCover(ContentCoverTarget.Window(12, 0, bounds), 1, 2)
 
     @Test
-    fun `both TikTok variants have cover detectors - other apps are unchanged`() {
+    fun `TikTok variants and Instagram have cover detectors - other apps are unchanged`() {
         BlockableApp.entries.forEach { app ->
             val resolved = ResolvedBlockableApp(app, app.getPackageIds().first())
-            if (app in setOf(BlockableApp.TIKTOK, BlockableApp.TIKTOK_LITE)) {
+            if (app in setOf(BlockableApp.TIKTOK, BlockableApp.TIKTOK_LITE, BlockableApp.REELS)) {
                 assertNotNull(app.coverDetector)
                 assertEquals(app, app.coverDetector!!.app)
                 assertSame(app.coverDetector, resolved.coverDetector)

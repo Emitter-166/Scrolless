@@ -29,5 +29,5 @@ Scrolless menggunakan Aksesibilitas hanya untuk mendeteksi layar video pendek ya
 
 Kurangi scrolling tanpa sadar, sedikit demi sedikit.
 
-Kode sumber: https://github.com/DuarteBarbosaDev/Scrolless
+Kode sumber: https://github.com/Emitter-166/Scrolless
 Ikon oleh Icons8

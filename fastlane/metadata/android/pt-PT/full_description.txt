@@ -29,5 +29,5 @@ O Scrolless usa a acessibilidade apenas para detetar ecrãs de vídeos curtos su
 
 Menos scroll sem sentido, um scroll de cada vez.
 
-Código-fonte: https://github.com/DuarteBarbosaDev/Scrolless
+Código-fonte: https://github.com/Emitter-166/Scrolless
 Ícones por Icons8

@@ -29,5 +29,5 @@ Scrolless używa ułatwień dostępu wyłącznie do wykrywania obsługiwanych ek
 
 Mniej bezmyślnego przewijania – o jeden scroll mniej za każdym razem.
 
-Kod źródłowy: https://github.com/DuarteBarbosaDev/Scrolless
+Kod źródłowy: https://github.com/Emitter-166/Scrolless
 Ikony od Icons8

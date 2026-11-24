@@ -29,5 +29,5 @@ Scrolless, Erişilebilirlik iznini yalnızca desteklenen kısa video ekranların
 
 Bilinçsiz kaydırmayı azalt, her seferinde bir kaydırma daha az.
 
-Kaynak kodu: https://github.com/DuarteBarbosaDev/Scrolless
+Kaynak kodu: https://github.com/Emitter-166/Scrolless
 Simgeler: Icons8

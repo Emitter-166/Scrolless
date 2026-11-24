@@ -29,5 +29,5 @@ Scrolless використовує службу доступності лише 
 
 Менше бездумного скролінгу — щоразу на один скрол менше.
 
-Вихідний код: https://github.com/DuarteBarbosaDev/Scrolless
+Вихідний код: https://github.com/Emitter-166/Scrolless
 Іконки від Icons8

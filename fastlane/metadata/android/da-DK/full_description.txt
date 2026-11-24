@@ -29,5 +29,5 @@ Scrolless bruger kun tilgængelighed til at genkende understøttede skærme med 
 
 Mindre tankeløs scrolling, ét scroll mindre ad gangen.
 
-Kildekode: https://github.com/DuarteBarbosaDev/Scrolless
+Kildekode: https://github.com/Emitter-166/Scrolless
 Ikoner af Icons8

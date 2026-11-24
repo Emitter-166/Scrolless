@@ -29,5 +29,5 @@ Scrolless používá usnadnění přístupu pouze k rozpoznání podporovaných 
 
 Méně bezmyšlenkovitého scrollování, pokaždé o jeden scroll méně.
 
-Zdrojový kód: https://github.com/DuarteBarbosaDev/Scrolless
+Zdrojový kód: https://github.com/Emitter-166/Scrolless
 Ikony od Icons8

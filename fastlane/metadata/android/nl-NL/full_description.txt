@@ -29,5 +29,5 @@ Scrolless gebruikt Toegankelijkheid alleen om ondersteunde schermen met korte vi
 
 Minder gedachteloos scrollen, één scroll minder per keer.
 
-Broncode: https://github.com/DuarteBarbosaDev/Scrolless
+Broncode: https://github.com/Emitter-166/Scrolless
 Iconen door Icons8

@@ -29,5 +29,5 @@ Scrolless chỉ dùng Trợ năng để phát hiện các màn hình video ngắ
 
 Bớt lướt vô thức, từng chút một.
 
-Mã nguồn: https://github.com/DuarteBarbosaDev/Scrolless
+Mã nguồn: https://github.com/Emitter-166/Scrolless
 Biểu tượng bởi Icons8

@@ -45,13 +45,18 @@ internal interface ContentCoverDetector {
 }
 
 /** A lightweight view representation (ID, bounds, and visibility) passed to cover detectors. */
-internal data class ContentCoverNode(val viewId: String, val bounds: ContentBounds, val isVisible: Boolean)
+internal data class ContentCoverNode(
+    val viewId: String,
+    val bounds: ContentBounds,
+    val isVisible: Boolean,
+    val isSelected: Boolean = false,
+)
 
 /** All active cover detectors registered in the app. */
 private val coverDetectors: Map<BlockableApp, ContentCoverDetector> = listOf(
     TikTokScreenDetector(BlockableApp.TIKTOK),
     TikTokScreenDetector(BlockableApp.TIKTOK_LITE),
-    // Add future app cover detectors here (e.g. InstagramScreenDetector)
+    InstagramScreenDetector(),
 ).associateBy { it.app }
 
 /** Returns cover rules for this app, or null if it uses full-screen blocking (Back or Home). */

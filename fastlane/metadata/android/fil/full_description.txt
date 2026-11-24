@@ -29,5 +29,5 @@ Ginagamit lang ng Scrolless ang Accessibility para matukoy ang mga suportadong s
 
 Bawasan ang walang-isip na pag-scroll, paisa-isang scroll.
 
-Source code: https://github.com/DuarteBarbosaDev/Scrolless
+Source code: https://github.com/Emitter-166/Scrolless
 Mga icon mula sa Icons8

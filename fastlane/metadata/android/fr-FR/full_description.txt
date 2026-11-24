@@ -29,5 +29,5 @@ Scrolless utilise l'accessibilité uniquement pour détecter les écrans de vid�
 
 Réduisez le défilement machinal, un scroll de moins à la fois.
 
-Code source : https://github.com/DuarteBarbosaDev/Scrolless
+Code source : https://github.com/Emitter-166/Scrolless
 Icônes par Icons8

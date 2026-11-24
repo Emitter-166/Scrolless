@@ -29,5 +29,5 @@ Scrolless usa l'accessibilità solo per rilevare le schermate di video brevi sup
 
 Riduci lo scorrimento senza pensieri, uno scroll in meno alla volta.
 
-Codice sorgente: https://github.com/DuarteBarbosaDev/Scrolless
+Codice sorgente: https://github.com/Emitter-166/Scrolless
 Icone di Icons8

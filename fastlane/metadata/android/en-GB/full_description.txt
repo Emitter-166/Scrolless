@@ -29,5 +29,5 @@ Scrolless uses Accessibility only to detect supported short-video screens and ap
 
 Reduce mindless scrolling, one scroll less at a time.
 
-Source code: https://github.com/DuarteBarbosaDev/Scrolless
+Source code: https://github.com/Emitter-166/Scrolless
 Icons by Icons8

@@ -29,5 +29,5 @@ Scrolless 仅使用无障碍功能来检测受支持的短视频界面并执行�
 
 减少无意识的刷屏，每次少刷一点。
 
-源代码：https://github.com/DuarteBarbosaDev/Scrolless
+源代码：https://github.com/Emitter-166/Scrolless
 图标来源：Icons8

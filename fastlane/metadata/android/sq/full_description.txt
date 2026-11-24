@@ -29,5 +29,5 @@ Scrolless e përdor qasshmërinë vetëm për të dalluar ekranet e mbështetura
 
 Më pak scroll pa qëllim, çdo herë një scroll më pak.
 
-Kodi burimor: https://github.com/DuarteBarbosaDev/Scrolless
+Kodi burimor: https://github.com/Emitter-166/Scrolless
 Ikonat nga Icons8

@@ -29,5 +29,5 @@ Scrollessはユーザー補助を、対応するショート動画画面の検�
 
 無意識のスクロールを、ひとつずつ減らしていきましょう。
 
-ソースコード: https://github.com/DuarteBarbosaDev/Scrolless
+ソースコード: https://github.com/Emitter-166/Scrolless
 アイコン提供: Icons8

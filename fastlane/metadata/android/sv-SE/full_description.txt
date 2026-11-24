@@ -29,5 +29,5 @@ Scrolless använder tillgänglighet enbart för att känna igen skärmar med kor
 
 Minska det tanklösa scrollandet, en scroll mindre i taget.
 
-Källkod: https://github.com/DuarteBarbosaDev/Scrolless
+Källkod: https://github.com/Emitter-166/Scrolless
 Ikoner från Icons8
