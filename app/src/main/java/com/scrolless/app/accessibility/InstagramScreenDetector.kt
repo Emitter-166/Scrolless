@@ -20,21 +20,22 @@ import com.scrolless.app.R
 import com.scrolless.app.core.model.BlockableApp
 
 /**
- * Covers known Instagram Home/Explore content, never an arbitrary scrolling list.
- * Resource IDs are version-dependent: unknown layouts deliberately stay usable rather than
- * covering a conversation or profile. No labels, usernames, or message text are inspected.
+ * Covers Home/Explore using selected navigation roles plus known IDs or scrollable geometry.
+ * Unknown navigation deliberately stays usable rather than covering a conversation or profile.
+ * Only fixed navigation-label tokens are used; usernames and message/post text are not inspected.
  */
 internal class InstagramScreenDetector : ContentCoverDetector {
     override val app = BlockableApp.REELS
     override val titleRes = R.string.instagram_blocked_title
     override val descriptionRes = R.string.instagram_blocked_description
 
-    private val homeContentIds = setOf("main_feed_recycler_view", "feed_list", "feed_recycler_view")
+    private val homeContentIds = setOf("main_feed_recycler_view", "feed_list", "feed_recycler_view", "list")
     private val exploreContentIds = setOf("explore_grid", "explore_recycler_view", "explore_feed")
     private val homeTabIds = setOf("feed_tab")
     private val exploreTabIds = setOf("search_tab", "explore_tab")
     private val bottomBarIds = setOf("tab_bar", "tab_bar_container", "bottom_navigation_bar")
-    private val headerIds = setOf("action_bar", "action_bar_container", "action_bar_wrapper")
+    private val headerIds =
+        setOf("action_bar", "action_bar_container", "action_bar_wrapper", "main_feed_action_bar", "action_bar_LinearLayout")
     private val allowedScreenIds = setOf(
         "direct_inbox_recycler_view",
         "direct_inbox_layout",
@@ -58,26 +59,31 @@ internal class InstagramScreenDetector : ContentCoverDetector {
         // Positive allowed-screen evidence must win, including while a feed cover is active.
         if (visible.any {
                 it.viewId in allowedScreenIds || it.viewId in fullScreenViewerIds ||
-                    (it.viewId in allowedTabIds && it.isSelected)
+                    ((it.viewId in allowedTabIds || it.navigationRole in setOf("profile", "messages", "inbox")) && it.isSelected)
             }
         ) {
             return null
         }
 
-        val homeSelected = visible.any { it.viewId in homeTabIds && it.isSelected }
-        val exploreSelected = visible.any { it.viewId in exploreTabIds && it.isSelected }
+        val homeSelected = visible.any { (it.viewId in homeTabIds || it.navigationRole == "home") && it.isSelected }
+        val exploreSelected = visible.any {
+            (it.viewId in exploreTabIds || it.navigationRole == "search" || it.navigationRole == "explore") && it.isSelected
+        }
         val contentIds = when {
             homeSelected -> homeContentIds
             exploreSelected -> exploreContentIds
             else -> return null
         }
-        // A tab alone is not sufficient: it can remain selected on an unrelated pushed screen.
-        // Retain an occluded feed only while that feed ID and selected tab both still exist.
+        // A tab alone is not sufficient: require a known feed or a large scrolling surface.
+        // Retain an occluded surface only with exactly matching previous cover geometry.
         val content = nodes.filter {
-            it.viewId in contentIds && it.bounds.isVisible && (it.isVisible || activeCoverBounds != null)
+            (it.viewId in contentIds || it.isScrollable) && it.bounds.isVisible &&
+                (it.isVisible || activeCoverBounds != null) && it.bounds.height > it.bounds.width / 2
         }.maxByOrNull { it.bounds.width.toLong() * it.bounds.height } ?: return null
 
-        val bottomBarTop = visible.filter { it.viewId in bottomBarIds + homeTabIds + exploreTabIds + allowedTabIds }
+        val bottomBarTop = visible.filter {
+            it.viewId in bottomBarIds + homeTabIds + exploreTabIds + allowedTabIds || it.navigationRole != null
+        }
             .map { it.bounds.top }.filter { it > content.bounds.top }.minOrNull() ?: return null
         val headerBottom = visible.filter { it.viewId in headerIds && it.bounds.bottom <= bottomBarTop }
             .maxOfOrNull { it.bounds.bottom } ?: content.bounds.top

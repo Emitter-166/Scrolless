@@ -76,6 +76,32 @@ class InstagramScreenDetectorTest {
     }
 
     @Test
+    fun `Pixel Instagram 457 android list layout is covered`() {
+        assertEquals(
+            ContentBounds(0, 283, 1080, 2211),
+            detector.coverBounds(
+                listOf(
+                    node("list", ContentBounds(0, 136, 1080, 2211)).copy(isScrollable = true),
+                    home.copy(bounds = ContentBounds(0, 2211, 216, 2337)),
+                    header.copy(viewId = "main_feed_action_bar", bounds = ContentBounds(0, 136, 1080, 283)),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `renamed IDs use selected navigation role and scrollable geometry`() {
+        val renamed = listOf(
+            feed.copy(viewId = "unknown_list", isScrollable = true),
+            home.copy(viewId = "unknown_tab", navigationRole = "home"),
+            header,
+        )
+        assertEquals(expected, detector.coverBounds(renamed))
+        assertNull(detector.coverBounds(renamed.map { if (it.navigationRole == "home") it.copy(isSelected = false) else it }))
+        assertNull(detector.coverBounds(renamed + home.copy(navigationRole = "messages")))
+    }
+
+    @Test
     fun `covered feed stays blocked but offscreen cached feed cannot start cover`() {
         val occluded = nodes.map { if (it == feed) it.copy(isVisible = false) else it }
         assertNull(detector.coverBounds(occluded))

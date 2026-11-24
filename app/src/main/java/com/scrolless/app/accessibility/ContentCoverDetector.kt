@@ -50,6 +50,9 @@ internal data class ContentCoverNode(
     val bounds: ContentBounds,
     val isVisible: Boolean,
     val isSelected: Boolean = false,
+    val navigationRole: String? = null,
+    val isScrollable: Boolean = false,
+    val isClickable: Boolean = false,
 )
 
 /** All active cover detectors registered in the app. */

@@ -30,6 +30,23 @@ import com.scrolless.app.core.model.DmExemptionRule
 import com.scrolless.app.core.model.ResolvedBlockableApp
 import com.scrolless.app.ui.overlay.ContentCover
 import com.scrolless.app.ui.overlay.ContentCoverTarget
+import java.util.Locale
+
+/** Reduce navigation descriptions to fixed tokens; never retain their original contents. */
+internal fun instagramNavigationRole(description: String?): String? {
+    val label = description?.lowercase(Locale.ROOT)?.trim() ?: return null
+    // Permit only fixed labels and numeric unread/badge suffixes, never arbitrary text.
+    val match = Regex(
+        "^(home|search|explore|messages|direct messages|direct|inbox|chats|profile)" +
+            "(?:[,，:]?\\s+\\d+\\+?(?:\\s+(?:unread|new|messages|notifications|items))*[.]?)?$",
+    ).matchEntire(label) ?: return null
+    return when (match.groupValues[1]) {
+        "home" -> "home"
+        "search", "explore" -> "explore"
+        "profile" -> "profile"
+        else -> "messages"
+    }
+}
 
 /**
  * Inspects visible windows to detect blocked content and compute cover bounds.
@@ -269,11 +286,74 @@ internal class ContentScanner(
         }
     }
 
-    // Read only the IDs requested by this app's detector; do not walk the whole screen tree.
+    // Instagram's feed IDs vary (including android:id/list). Collect bounded structural metadata,
+    // never text/usernames/messages. Only known navigation labels are reduced to fixed role tokens.
+    private fun AccessibilityNodeInfo.instagramNodes(): List<Pair<AccessibilityNodeInfo, ContentCoverNode>> {
+        val rootBounds = coverBounds()
+        val queue = ArrayDeque<AccessibilityNodeInfo>()
+        queue.add(this)
+        val result = mutableListOf<Pair<AccessibilityNodeInfo, ContentCoverNode>>()
+        var visited = 0
+        while (queue.isNotEmpty() && visited++ < 1500) {
+            val node = queue.removeFirst()
+            val bounds = node.coverBounds()
+            val id = node.viewIdResourceName?.substringAfter(":id/").orEmpty()
+            val bottomControl = bounds.top >= rootBounds.top + rootBounds.height * 3 / 4 &&
+                bounds.height < rootBounds.height / 5 && bounds.width < rootBounds.width / 2 && node.isClickable
+            val role = if (bottomControl) {
+                when {
+                    id.matches(Regex("(feed|home)_tab")) -> "home"
+                    id.matches(Regex("(direct|inbox|messages)_tab")) -> "messages"
+                    id == "profile_tab" -> "profile"
+                    id.matches(Regex("(search|explore)_tab")) -> "explore"
+                    else -> instagramNavigationRole(node.contentDescription?.toString())
+                }
+            } else {
+                null
+            }
+            val canonicalId = when {
+                (id.contains("action_bar", ignoreCase = true) || id.contains("toolbar", ignoreCase = true)) &&
+                    bounds.height < rootBounds.height / 5 && bounds.width > rootBounds.width / 2 -> "action_bar"
+
+                id.startsWith("direct_") && (id.contains("thread") || id.contains("inbox")) -> "direct_inbox_layout"
+
+                id.startsWith("profile_header") -> "profile_header"
+
+                else -> id
+            }
+            result += node to ContentCoverNode(
+                canonicalId, bounds, node.isVisibleToUser, node.isSelected,
+                role, node.isScrollable, node.isClickable,
+            )
+            for (index in 0 until node.childCount) {
+                node.getChild(index)?.let(queue::addLast)
+            }
+        }
+        return result
+    }
+
+    /** Click only the positively identified messaging navigation control, never list entries. */
+    fun redirectInstagramHomeToMessages(): Boolean {
+        val windows = AppWindows(service.windows)
+        if (windows.foregroundPackage != "com.instagram.android") return false
+        val root = windows.roots.values.firstOrNull { it?.packageName?.toString() == "com.instagram.android" } ?: return false
+        val nodes = root.instagramNodes()
+        val detector = BlockableApp.REELS.coverDetector ?: return false
+        if (detector.coverBounds(nodes.map { it.second }) == null) return false
+        if (nodes.none { (_, node) -> node.isVisible && node.isSelected && node.navigationRole == "home" }) return false
+        return nodes.firstOrNull { (_, node) ->
+            node.isVisible && node.isClickable && node.navigationRole == "messages"
+        }?.first?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true
+    }
+
     private fun AccessibilityNodeInfo.coverNodes(app: ResolvedBlockableApp, viewIds: Set<String>): List<ContentCoverNode> =
-        viewIds.flatMap { id ->
-            findAccessibilityNodeInfosByViewId("${app.packageId}:id/$id").map { node ->
-                ContentCoverNode(id, node.coverBounds(), node.isVisibleToUser, node.isSelected)
+        if (app.app == BlockableApp.REELS) {
+            instagramNodes().map { it.second }
+        } else {
+            viewIds.flatMap { id ->
+                findAccessibilityNodeInfosByViewId("${app.packageId}:id/$id").map { node ->
+                    ContentCoverNode(id, node.coverBounds(), node.isVisibleToUser, node.isSelected)
+                }
             }
         }
 

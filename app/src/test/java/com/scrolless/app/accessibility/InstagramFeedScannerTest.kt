@@ -25,6 +25,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -94,6 +95,37 @@ class InstagramFeedScannerTest {
         assertNull(exit.content)
     }
 
+    @Test
+    fun `captured Android list and renamed navigation use fallback and click only Messages`() {
+        service.showTestWindow(instagram.packageId)
+        addNode("renamed_feed", Rect(0, 136, 1080, 2211), scrollable = true)
+        addNode("renamed_home", Rect(0, 2211, 216, 2337), selected = true, label = "Home", clickable = true)
+        addNode("renamed_messages", Rect(432, 2211, 648, 2337), label = "Messages, 3 unread", clickable = true)
+        addNode("renamed_toolbar", Rect(0, 136, 1080, 283))
+        assertEquals(
+            ContentBounds(0, 283, 1080, 2211),
+            scanner.findVisibleBlockedContent(instagram)?.cover?.target?.bounds,
+        )
+        val messages = service.rootInActiveWindow.getChild(2)!!
+        shadowOf(messages).setOnPerformActionListener { action, _ -> action == AccessibilityNodeInfo.ACTION_CLICK }
+        assertTrue(scanner.redirectInstagramHomeToMessages())
+        assertEquals(AccessibilityNodeInfo.ACTION_CLICK, shadowOf(messages).performedActions.single())
+        assertTrue(shadowOf(service.rootInActiveWindow.getChild(0)).performedActions.isEmpty())
+    }
+
+    @Test
+    fun `generic list without selected Home and message content cannot trigger redirect`() {
+        service.showTestWindow(instagram.packageId)
+        addNode("list", Rect(0, 136, 1080, 2211), scrollable = true)
+        addNode("unknown", Rect(0, 2211, 216, 2337), selected = true, label = "Profile", clickable = true)
+        assertNull(scanner.findVisibleBlockedContent(instagram))
+        assertFalse(scanner.redirectInstagramHomeToMessages())
+        assertNull(instagramNavigationRole("Messages from a person"))
+        assertEquals("messages", instagramNavigationRole("Messages, 12 unread"))
+        assertEquals("home", instagramNavigationRole("HOME"))
+        assertNull(instagramNavigationRole("user profile"))
+    }
+
     private fun showHome(packageId: String = instagram.packageId) {
         service.showTestWindow(packageId)
         addNode("main_feed_recycler_view", Rect(0, 100, 1080, 2200), packageId = packageId)
@@ -102,12 +134,23 @@ class InstagramFeedScannerTest {
     }
 
     @Suppress("DEPRECATION")
-    private fun addNode(id: String, bounds: Rect, selected: Boolean = false, packageId: String = instagram.packageId) {
+    private fun addNode(
+        id: String,
+        bounds: Rect,
+        selected: Boolean = false,
+        packageId: String = instagram.packageId,
+        scrollable: Boolean = false,
+        clickable: Boolean = false,
+        label: String? = null,
+    ) {
         val node = AccessibilityNodeInfo.obtain().apply {
             packageName = packageId
             viewIdResourceName = "$packageId:id/$id"
             isVisibleToUser = true
             isSelected = selected
+            isScrollable = scrollable
+            isClickable = clickable
+            contentDescription = label
             setBoundsInScreen(bounds)
         }
         shadowOf(service.rootInActiveWindow).addChild(node)

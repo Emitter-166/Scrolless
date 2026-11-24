@@ -614,6 +614,11 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
                     return
                 }
                 val cover = session.content.cover ?: return
+                // Redirect only after policy says BlockNow. Keep the cover as a fallback even
+                // if Instagram accepts the click but navigation fails or is delayed.
+                if (session.app.app == BlockableApp.REELS) {
+                    contentScanner.redirectInstagramHomeToMessages()
+                }
                 // Returning from Recents can replace the app's drawing surface without resizing it.
                 // Reattach now; normal screen updates can keep using that attachment.
                 if (!blockedContentOverlayManager.show(cover, refreshAttachment = true)) {
