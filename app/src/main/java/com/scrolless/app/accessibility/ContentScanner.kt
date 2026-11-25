@@ -189,6 +189,12 @@ internal class ContentScanner(
         // Covers need foreground focus so they don't appear over another app after switching away.
         if (blockableApp.coverDetector != null && !appWindows.isVisible(blockableApp)) return null
 
+        // Full-screen Reels/Stories have indexed IDs. Avoid a potentially large feed tree walk
+        // on every animation event and never mistake retained Home nodes for the active player.
+        if (blockableApp.app == BlockableApp.REELS && matchesBlockedContent(blockableApp, appWindows)) {
+            return DetectedBlockedContent(blockableApp, shouldSuppressBlocking(blockableApp, null))
+        }
+
         // If we can locate the video, we can cover just that area and leave the app's controls usable.
         val cover = detectContentCover(blockableApp, appWindows, activeCover)
 
@@ -289,6 +295,28 @@ internal class ContentScanner(
     // Instagram's feed IDs vary (including android:id/list). Collect bounded structural metadata,
     // never text/usernames/messages. Only known navigation labels are reduced to fixed role tokens.
     private fun AccessibilityNodeInfo.instagramNodes(): List<Pair<AccessibilityNodeInfo, ContentCoverNode>> {
+        // Common layouts need only indexed lookups, not hundreds of cross-process child calls.
+        // Keep the structural/label traversal as fallback when IDs change.
+        val detector = BlockableApp.REELS.coverDetector!!
+        val indexed = detector.viewIds.flatMap { id ->
+            val qualifiedIds = if (id == "list") listOf("android:id/list", "com.instagram.android:id/list") else {
+                listOf("com.instagram.android:id/$id")
+            }
+            qualifiedIds.flatMap(::findAccessibilityNodeInfosByViewId).map { node ->
+                val role = when (id) {
+                    "feed_tab" -> "home"
+                    "direct_tab", "inbox_tab" -> "messages"
+                    "profile_tab" -> "profile"
+                    "search_tab", "explore_tab" -> "explore"
+                    else -> null
+                }
+                node to ContentCoverNode(
+                    id, node.coverBounds(), node.isVisibleToUser, node.isSelected,
+                    role, node.isScrollable, node.isClickable,
+                )
+            }
+        }
+        if (detector.coverBounds(indexed.map { it.second }) != null) return indexed
         val rootBounds = coverBounds()
         val queue = ArrayDeque<AccessibilityNodeInfo>()
         queue.add(this)
@@ -333,14 +361,16 @@ internal class ContentScanner(
     }
 
     /** Click only the positively identified messaging navigation control, never list entries. */
-    fun redirectInstagramHomeToMessages(): Boolean {
+    fun redirectInstagramToMessages(): Boolean {
         val windows = AppWindows(service.windows)
         if (windows.foregroundPackage != "com.instagram.android") return false
         val root = windows.roots.values.firstOrNull { it?.packageName?.toString() == "com.instagram.android" } ?: return false
         val nodes = root.instagramNodes()
         val detector = BlockableApp.REELS.coverDetector ?: return false
-        if (detector.coverBounds(nodes.map { it.second }) == null) return false
-        if (nodes.none { (_, node) -> node.isVisible && node.isSelected && node.navigationRole == "home" }) return false
+        val reelsVisible = root.hasVisibleViewId("com.instagram.android:id/clips_viewer_view_pager")
+        val homeVisible = nodes.any { (_, node) -> node.isVisible && node.isSelected && node.navigationRole == "home" } &&
+            detector.coverBounds(nodes.map { it.second }) != null
+        if (!reelsVisible && !homeVisible) return false
         return nodes.firstOrNull { (_, node) ->
             node.isVisible && node.isClickable && node.navigationRole == "messages"
         }?.first?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true

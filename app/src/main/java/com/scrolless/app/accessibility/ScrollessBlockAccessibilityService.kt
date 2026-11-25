@@ -23,6 +23,7 @@ import android.content.ComponentName
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import com.scrolless.app.BuildConfig
 import com.scrolless.app.core.accessibility.AccessibilityServiceConnection
@@ -108,6 +109,10 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
 
     /** Main thread handler for running UI-related actions like overlays and navigation. */
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val scanScheduler by lazy { ForegroundScanScheduler(mainHandler, ::scanCurrentScreen) }
+    private var currentBlockOption: BlockOption? = null
+    private var lastBackActionMillis = 0L
 
     /** Coroutine scope for service operations. Uses SupervisorJob so child failures don't cancel the service. */
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -272,6 +277,7 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
                 .collect { (option, settings) ->
                     Timber.d("Blocking option changed: %s", option)
                     blockingManager.init(option, settings)
+                    currentBlockOption = option
                     reconsiderVisibleContent()
                 }
         }
@@ -370,9 +376,18 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
             currentActivity = event.packageName?.let { ComponentName(it.toString(), className) }
         }
 
+        // Coalesce animation events with a non-sliding deadline; never walk the tree per event.
+        scanScheduler.request()
+    }
+
+    private fun scanCurrentScreen() {
+        if (!powerManager.isInteractive) {
+            handleTrackedAppExit("screen off during scheduled scan")
+            return
+        }
         val scan = contentScanner.scan(
-            event.packageName?.toString(),
-            event.eventType == AccessibilityEvent.TYPE_WINDOWS_CHANGED,
+            null,
+            true,
             contentSession?.app,
             currentForegroundBrainRotApp,
             contentSession?.takeIf { it.isCovered }?.content?.cover,
@@ -422,6 +437,7 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
         }
 
         currentForegroundBrainRotApp = nextApp
+        scanScheduler.setForeground(nextApp?.app == BlockableApp.REELS)
         refreshServiceConfig()
     }
 
@@ -437,6 +453,7 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
             contentSession != null, viewingSession?.app,
         )
         stopPeriodicCheck()
+        scanScheduler.stop()
         mainHandler.removeCallbacks(coveredContentCheck)
         blockedContentOverlayManager.hide()
         timerOverlayManager.cleanup()
@@ -458,6 +475,10 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
                     onBlockedContentExited()
                 } else {
                     if (suppressionChanged) reconsiderVisibleContent()
+                    // A Back action may be swallowed by animation; retry on recovery scans.
+                    if (!activeSession.isCovered && currentBlockOption == BlockOption.BlockAll && !isBlockingSuppressed) {
+                        serviceScope.launch { enforceBlocking(activeSession) }
+                    }
                     return
                 }
             }
@@ -479,6 +500,13 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
         refreshServiceConfig()
 
         startPeriodicCheck()
+
+        // Block All has no allowance to load. Do not queue usage database reads ahead of
+        // enforcement on every rapid tab entry. Pause and DM exemptions still take priority.
+        if (currentBlockOption == BlockOption.BlockAll && !isBlockingSuppressed) {
+            serviceScope.launch { enforceBlocking(session) }
+            return
+        }
 
         serviceScope.launch {
             // Load timer settings alongside usage so displaying the timer does not add another wait.
@@ -605,7 +633,14 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
     private suspend fun enforceBlocking(session: ContentSession) {
         if (viewingSession !== session || isBlockingSuppressed) return
         when (val action = session.content.blockAction) {
-            is ContentBlockAction.PerformGlobalAction -> performGlobalAction(action.action)
+            is ContentBlockAction.PerformGlobalAction -> {
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastBackActionMillis >= 300L) {
+                    lastBackActionMillis = now
+                    val redirected = session.app.app == BlockableApp.REELS && contentScanner.redirectInstagramToMessages()
+                    if (!redirected) performGlobalAction(action.action)
+                }
+            }
 
             ContentBlockAction.CoverVideoRegion -> {
                 // The user may have switched apps while we were waiting for the blocking decision.
@@ -617,7 +652,7 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
                 // Redirect only after policy says BlockNow. Keep the cover as a fallback even
                 // if Instagram accepts the click but navigation fails or is delayed.
                 if (session.app.app == BlockableApp.REELS) {
-                    contentScanner.redirectInstagramHomeToMessages()
+                    contentScanner.redirectInstagramToMessages()
                 }
                 // Returning from Recents can replace the app's drawing surface without resizing it.
                 // Reattach now; normal screen updates can keep using that attachment.
@@ -709,7 +744,11 @@ class ScrollessBlockAccessibilityService : AccessibilityService() {
         val info = serviceInfo ?: return
 
         // Do not delay Home/app-switching events while covered, or the old screen cover can linger.
-        info.notificationTimeout = if (contentSession?.isCovered == true) 0L else DEFAULT_NOTIFICATION_TIMEOUT_MS
+        info.notificationTimeout = if (contentSession?.isCovered == true || currentForegroundBrainRotApp?.app == BlockableApp.REELS) {
+            0L
+        } else {
+            DEFAULT_NOTIFICATION_TIMEOUT_MS
+        }
 
         if (listenToAll) {
             info.packageNames = null // Listen to all

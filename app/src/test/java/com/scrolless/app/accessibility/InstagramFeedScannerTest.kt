@@ -108,9 +108,27 @@ class InstagramFeedScannerTest {
         )
         val messages = service.rootInActiveWindow.getChild(2)!!
         shadowOf(messages).setOnPerformActionListener { action, _ -> action == AccessibilityNodeInfo.ACTION_CLICK }
-        assertTrue(scanner.redirectInstagramHomeToMessages())
+        assertTrue(scanner.redirectInstagramToMessages())
         assertEquals(AccessibilityNodeInfo.ACTION_CLICK, shadowOf(messages).performedActions.single())
         assertTrue(shadowOf(service.rootInActiveWindow.getChild(0)).performedActions.isEmpty())
+    }
+
+    @Test
+    fun `Reels redirects directly to Messages when navigation is available`() {
+        service.showTestWindow(instagram.packageId)
+        addNode("clips_viewer_view_pager", Rect(0, 136, 1080, 2211))
+        addNode("direct_tab", Rect(432, 2211, 648, 2337), clickable = true)
+        val messages = service.rootInActiveWindow.getChild(1)!!
+        shadowOf(messages).setOnPerformActionListener { action, _ -> action == AccessibilityNodeInfo.ACTION_CLICK }
+        assertTrue(scanner.redirectInstagramToMessages())
+        assertEquals(AccessibilityNodeInfo.ACTION_CLICK, shadowOf(messages).performedActions.single())
+    }
+
+    @Test
+    fun `Reels without messaging navigation requests Back fallback without clicking content`() {
+        service.showTestWindow(instagram.packageId)
+        addNode("clips_viewer_view_pager", Rect(0, 136, 1080, 2211))
+        assertFalse(scanner.redirectInstagramToMessages())
     }
 
     @Test
@@ -119,7 +137,7 @@ class InstagramFeedScannerTest {
         addNode("list", Rect(0, 136, 1080, 2211), scrollable = true)
         addNode("unknown", Rect(0, 2211, 216, 2337), selected = true, label = "Profile", clickable = true)
         assertNull(scanner.findVisibleBlockedContent(instagram))
-        assertFalse(scanner.redirectInstagramHomeToMessages())
+        assertFalse(scanner.redirectInstagramToMessages())
         assertNull(instagramNavigationRole("Messages from a person"))
         assertEquals("messages", instagramNavigationRole("Messages, 12 unread"))
         assertEquals("home", instagramNavigationRole("HOME"))
